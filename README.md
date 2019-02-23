@@ -9,7 +9,7 @@ Installation
 ```bash
 sudo -i
 cd /tmp
-wget -q -O - https://raw.githubusercontent.com/Amet13/ddos-deflate/master/install.sh | bash
+wget -q -O - https://raw.githubusercontent.com/igoros777/ddos-deflate/master/install.sh | bash
 ```
 Setup config for example:
 ```bash
