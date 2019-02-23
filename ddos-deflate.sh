@@ -30,11 +30,11 @@ unbanip()
 		echo $LINE >> $UNBAN_IP_LIST
 	done < $BANNED_IP_LIST
 	echo "grep -v --file=$UNBAN_IP_LIST $IGNORE_IP_LIST > $TMP_FILE" >> $UNBAN_SCRIPT
-	echo "mv $TMP_FILE $IGNORE_IP_LIST" >> $UNBAN_SCRIPT
-	echo "rm -f $UNBAN_SCRIPT" >> $UNBAN_SCRIPT
-	echo "rm -f $UNBAN_IP_LIST" >> $UNBAN_SCRIPT
-	echo "rm -f $TMP_FILE" >> $UNBAN_SCRIPT
-	. $UNBAN_SCRIPT &
+	echo "/bin/mv $TMP_FILE $IGNORE_IP_LIST" >> $UNBAN_SCRIPT
+	echo "/bin/rm -f $UNBAN_SCRIPT" >> $UNBAN_SCRIPT
+	echo "/bin/rm -f $UNBAN_IP_LIST" >> $UNBAN_SCRIPT
+	echo "/bin/rm -f $TMP_FILE" >> $UNBAN_SCRIPT
+	. $UNBAN_SCRIPT & disown
 }
 
 TMP_PREFIX='/tmp/ddos-deflate'
@@ -48,9 +48,17 @@ echo >> $BANNED_IP_MAIL
 
 BAD_IP_LIST=`$TMP_FILE`
 if [ $CUSTOM_PORTS == "NO" ]; then
-	netstat -ntu | grep ^tcp | awk '{print $5}' | cut -d: -f1 | sort | uniq -c | sort -nr > $BAD_IP_LIST
+	# grep for valid IPv4 IP and exclude private networks lest you block your own gateway
+	netstat -ntu | awk '{print $5}' | \
+	grep -oE "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)" | \
+	grep -Ev "(^0\.)|(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)" \
+	sort -V | uniq -c | sort -nr > $BAD_IP_LIST
 else
-	netstat -ntu | grep ^tcp | grep -E "$CUSTOM_PORTS" | awk '{print $5}' | cut -d: -f1 | sort | uniq -c | sort -nr > $BAD_IP_LIST
+	# grep for valid IPv4 IP and exclude private networks lest you block your own gateway
+	netstat -ntu | awk '{print $5}' | \
+	grep -oE "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)" | \
+	grep -Ev "(^0\.)|(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)" | \
+	grep -E "$CUSTOM_PORTS" | sort | uniq -c | sort -nr > $BAD_IP_LIST
 fi
 
 cat $BAD_IP_LIST
@@ -77,9 +85,9 @@ done < $BAD_IP_LIST
 
 if [ $IP_BAN_NOW -eq 1 ]; then
 	if [ $EMAIL_TO != "" ]; then
-		cat $BANNED_IP_MAIL | mail -s "IP addresses banned on $DATE" $EMAIL_TO
+		cat $BANNED_IP_MAIL | mailx -s "IP addresses banned on $DATE" $EMAIL_TO
 	fi
 	unbanip
 fi
 
-rm -f $TMP_PREFIX.*
+/bin/rm -f $TMP_PREFIX.*
