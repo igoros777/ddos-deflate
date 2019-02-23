@@ -48,9 +48,9 @@ echo >> $BANNED_IP_MAIL
 
 BAD_IP_LIST=`$TMP_FILE`
 if [ $CUSTOM_PORTS == "NO" ]; then
-	netstat -ntu | awk '{print $5}' | cut -d: -f1 | sort | uniq -c | sort -nr > $BAD_IP_LIST
+	netstat -ntu | grep ^tcp | awk '{print $5}' | cut -d: -f1 | sort | uniq -c | sort -nr > $BAD_IP_LIST
 else
-	netstat -ntu | grep -E "$CUSTOM_PORTS" | awk '{print $5}' | cut -d: -f1 | sort | uniq -c | sort -nr > $BAD_IP_LIST
+	netstat -ntu | grep ^tcp | grep -E "$CUSTOM_PORTS" | awk '{print $5}' | cut -d: -f1 | sort | uniq -c | sort -nr > $BAD_IP_LIST
 fi
 
 cat $BAD_IP_LIST
