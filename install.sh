@@ -10,7 +10,7 @@ if [ $ISROOT -ne 0 ]; then
 	exit 1
 fi
 
-if [ -e /usr/bin/netstat ] || [ -e /bin/netstat ]; then
+if [ -x "`which netstat 2>&1 | head -1`" ]; then
 	:
 else
 	printf "${RED}Please install netstat from net-tools package at first.${NC}\n"
@@ -18,7 +18,7 @@ else
 	exit 1
 fi
 
-if [ ! -e /usr/bin/mail ] || [ ! -e /bin/mail ]; then
+if [ ! -x "`which mailx 2>&1 | head -1`" ]; then
 	printf "${RED}Please install mail from mailx or mailutils package at first.${NC}\n"
 	printf "For example:\n${GR}yum install mailx${NC} or ${GR}apt-get install mailutils${NC}\n"
 	exit 1
