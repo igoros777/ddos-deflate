@@ -18,7 +18,7 @@ else
 	exit 1
 fi
 
-if [ ! -e /usr/bin/mail ]; then
+if [ ! -e /usr/bin/mail ] || [ ! -e /bin/mail ]; then
 	printf "${RED}Please install mail from mailx or mailutils package at first.${NC}\n"
 	printf "For example:\n${GR}yum install mailx${NC} or ${GR}apt-get install mailutils${NC}\n"
 	exit 1
