@@ -10,20 +10,6 @@ if [ $ISROOT -ne 0 ]; then
 	exit 1
 fi
 
-if [ -x "`which netstat 2>&1 | head -1`" ]; then
-	:
-else
-	printf "${RED}Please install netstat from net-tools package at first.${NC}\n"
-	printf "For example:\n${GR}yum install net-tools${NC} or ${GR}apt-get install net-tools${NC}\n"
-	exit 1
-fi
-
-if [ ! -x "`which mailx 2>&1 | head -1`" ]; then
-	printf "${RED}Please install mail from mailx or mailutils package at first.${NC}\n"
-	printf "For example:\n${GR}yum install mailx${NC} or ${GR}apt-get install mailutils${NC}\n"
-	exit 1
-fi
-
 DIR="/usr/local/ddos-deflate"
 REPO="https://raw.githubusercontent.com/Amet13/ddos-deflate/master"
 if [ -d $DIR ]; then
